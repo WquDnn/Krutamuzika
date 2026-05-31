@@ -1,99 +1,78 @@
 const express = require("express");
-const cors = require("cors")
-const db = require("./db.js")
-const multer = require('multer');
-const path = require('path');
-
+const cors = require("cors");
+const multer = require("multer");
+const path = require("path");
+const db = require("./db");
 
 const app = express();
-app.use(cors({
-    origin: "*",
-    allowedHeaders: "*",
-    methods: "*"
-}))
-app.use(express.static("static"))
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
-
-app.get("/", async (req, res)=>{
-    try{
-        let [result, _] = await db.query("SHOW TABLES")
-        res.status(200).json(result)
-    }catch(error){
-        res.status(500).send(error.message)
-        console.log(error)
-    }
-})
-
-app.use('/uploads', express.static('uploads'));
-
-app.get("/tracks", (req, res) => {
-    db.query("SELECT * FROM musicinfo", (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send({ error: "Помилка бази даних" });
-        }
-        res.send(results); // Відправляємо масив треків у React
-    });
-});
 
 app.use(cors());
+app.use(express.json());
 
+// статичні файли
+app.use("/uploads", express.static("uploads"));
+
+// MULTER
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'public');
-    },
-    filename: (req, file, cb) => {
-        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-    }
-});
-const upload = multer({ storage: storage });
-
-app.post("/add", upload.fields([{ name: "image", maxCount: 1 }, { name: "audio", maxCount: 1 }]), (req, res) => {
-    // Перевіряємо, чи прийшли файли, щоб уникнути крашу
-    const imageFile = req.files && req.files.image ? req.files.image[0].filename : null;
-    const audioFile = req.files && req.files.audio ? req.files.audio[0].filename : null;
-
-    // Збираємо дані чітко під структуру таблиці musicinfo
-    const musicData = {
-        genre: req.body.genre,
-        author: req.body.author,
-        name: req.body.name,
-        file_url: audioFile,  
-        image: imageFile      
-    };
-
-    // Валідація: якщо обов'язкові поля порожні, не пускаємо в базу
-    if (!musicData.genre || !musicData.author || !musicData.name || !musicData.file_url || !musicData.image) {
-        return res.status(400).send({ status: "error", message: "Усі поля та файли обов'язкові" });
-    }
-
-    // Робимо запит до бази даних
-    db.query("INSERT INTO musicinfo SET ?", musicData, (err, result) => {
-        if (err) {
-            console.error("Помилка бази даних:", err);
-            return res.status(500).send({ status: "error", message: "Помилка сервера при збереженні" });
+        if (file.fieldname === "image") {
+            cb(null, "uploads/images");
+        } else {
+            cb(null, "uploads/audio");
         }
-        
-        // Обов'язково повертаємо відповідь клієнту всередині колбеку!
-        res.status(201).send({ status: "ok", id: result.insertId });
-    });
-});
-
-app.listen(3000, () => console.log("Server started on port 3000"));
-
-
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public');
     },
     filename: (req, file, cb) => {
-        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-    }
+        cb(
+            null,
+            Date.now() + path.extname(file.originalname)
+        );
+    },
 });
-const upload = multer({ storage: storage });
 
-app.post('/upload', upload.fields([{ name: 'image'}]), (req, res) => {
-    res.redirect('/');
-});
+const upload = multer({ storage });
+
+// POST MUSIC
+app.post(
+    "/music",
+    upload.fields([
+        { name: "image", maxCount: 1 },
+        { name: "audio", maxCount: 1 },
+    ]),
+    (req, res) => {
+        const { name, author, genre } = req.body;
+
+        const image =
+            req.files?.image?.[0]?.filename || null;
+        const audio =
+            req.files?.audio?.[0]?.filename || null;
+
+        if (!name || !author || !genre || !image || !audio) {
+            return res
+                .status(400)
+                .json({ success: false, message: "empty fields" });
+        }
+
+        db.query(
+            `INSERT INTO musicinfo (genre, author, name, file_url, image)
+             VALUES (?, ?, ?, ?, ?)`,
+            [genre, author, name, audio, image],
+            (err, result) => {
+                if (err) {
+                    return res.status(500).json({
+                        success: false,
+                        error: err.message,
+                    });
+                }
+
+                res.json({
+                    success: true,
+                    id: result.insertId,
+                });
+            }
+        );
+    }
+);
+
+app.listen(3000, () =>
+    console.log("Server running on port 3000")
+);

@@ -24,9 +24,9 @@ export default function App() {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
+        setImage(file);
 
         if (file) {
-            setImage(file);
             setPreview(URL.createObjectURL(file));
         }
     };
@@ -39,215 +39,118 @@ export default function App() {
         formData.append("name", form.name);
         formData.append("author", form.author);
         formData.append("genre", form.genre);
+
         formData.append("image", image);
-        formData.append("file", audio);
+        formData.append("audio", audio); // 👈 ВАЖЛИВО
 
-        try {
-            const response = await fetch(
-                "http://localhost:3000/music",
-                {
-                    method: "POST",
-                    body: formData,
-                }
-            );
+        const res = await fetch("http://localhost:3000/music", {
+            method: "POST",
+            body: formData,
+        });
 
-            const data = await response.json();
+        const data = await res.json();
+        console.log(data);
 
-            if (data.success) {
-                alert("Трек успішно додано!");
+        if (data.success) {
+            alert("Трек додано!");
 
-                setForm({
-                    name: "",
-                    author: "",
-                    genre: "",
-                });
-
-                setImage(null);
-                setAudio(null);
-                setPreview("");
-            }
-        } catch (error) {
-            console.error(error);
+            setForm({ name: "", author: "", genre: "" });
+            setImage(null);
+            setAudio(null);
+            setPreview("");
         }
     };
 
     return (
-        <Box
-            sx={{
-                minHeight: "100vh",
-                background:
-                    "linear-gradient(135deg, #0f172a 0%, #111827 60%, #052e16 100%)",
-                display: "flex",
-                alignItems: "center",
-                py: 5,
-            }}
-        >
+        <Box sx={{ minHeight: "100vh", bgcolor: "#0f172a", py: 5 }}>
             <Container maxWidth="sm">
                 <Paper
-                    elevation={0}
                     sx={{
                         p: 4,
-                        borderRadius: 6,
+                        borderRadius: 5,
                         bgcolor: "#1e293b",
-                        border:
-                            "1px solid rgba(34,197,94,.15)",
-                        backdropFilter: "blur(12px)",
+                        border: "1px solid rgba(34,197,94,.2)",
                     }}
                 >
                     <Typography
                         variant="h4"
-                        align="center"
-                        fontWeight={700}
-                        color="#f8fafc"
-                        gutterBottom
+                        textAlign="center"
+                        color="white"
+                        fontWeight="bold"
+                        mb={1}
                     >
-                        🎵 Нова пісня
+                        🎵 Медіатека
                     </Typography>
 
                     <Typography
-                        align="center"
-                        sx={{
-                            color: "#94a3b8",
-                            mb: 4,
-                        }}
+                        textAlign="center"
+                        color="#94a3b8"
+                        mb={3}
                     >
-                        Додайте трек до своєї медіатеки
+                        Додай новий трек
                     </Typography>
 
-                    <Stack
-                        spacing={3}
-                        component="form"
-                        onSubmit={handleSubmit}
-                    >
+                    <Stack spacing={2} component="form" onSubmit={handleSubmit}>
                         {preview && (
                             <Box
+                                component="img"
+                                src={preview}
                                 sx={{
-                                    display: "flex",
-                                    justifyContent:
-                                        "center",
+                                    width: 200,
+                                    height: 200,
+                                    objectFit: "cover",
+                                    borderRadius: 3,
+                                    mx: "auto",
+                                    border: "2px solid #22c55e",
                                 }}
-                            >
-                                <Box
-                                    component="img"
-                                    src={preview}
-                                    alt="cover"
-                                    sx={{
-                                        width: 220,
-                                        height: 220,
-                                        objectFit:
-                                            "cover",
-                                        borderRadius: 4,
-                                        border:
-                                            "3px solid rgba(34,197,94,.2)",
-                                        boxShadow:
-                                            "0 20px 40px rgba(34,197,94,.15)",
-                                    }}
-                                />
-                            </Box>
+                            />
                         )}
 
                         <TextField
-                            label="Назва пісні"
-                            fullWidth
+                            label="Назва"
                             value={form.name}
                             onChange={(e) =>
-                                setForm({
-                                    ...form,
-                                    name: e.target.value,
-                                })
+                                setForm({ ...form, name: e.target.value })
                             }
-                            sx={fieldStyles}
+                            sx={inputStyle}
                         />
 
                         <TextField
                             label="Автор"
-                            fullWidth
                             value={form.author}
                             onChange={(e) =>
-                                setForm({
-                                    ...form,
-                                    author:
-                                        e.target.value,
-                                })
+                                setForm({ ...form, author: e.target.value })
                             }
-                            sx={fieldStyles}
+                            sx={inputStyle}
                         />
 
                         <TextField
                             label="Жанр"
-                            fullWidth
                             value={form.genre}
                             onChange={(e) =>
-                                setForm({
-                                    ...form,
-                                    genre:
-                                        e.target.value,
-                                })
+                                setForm({ ...form, genre: e.target.value })
                             }
-                            sx={fieldStyles}
+                            sx={inputStyle}
                         />
 
-                        <Button
-                            component="label"
-                            startIcon={
-                                <CloudUploadIcon />
-                            }
-                            sx={{
-                                py: 1.5,
-                                borderRadius: 3,
-                                bgcolor:
-                                    "rgba(34,197,94,.12)",
-                                color: "#86efac",
-                                border:
-                                    "1px solid rgba(34,197,94,.2)",
-                                "&:hover": {
-                                    bgcolor:
-                                        "rgba(34,197,94,.2)",
-                                },
-                            }}
-                        >
-                            Завантажити обкладинку
-
+                        <Button component="label" variant="outlined">
+                            📷 Обкладинка
                             <input
                                 hidden
                                 type="file"
                                 accept="image/*"
-                                onChange={
-                                    handleImageChange
-                                }
+                                onChange={handleImageChange}
                             />
                         </Button>
 
-                        <Button
-                            component="label"
-                            startIcon={
-                                <MusicNoteIcon />
-                            }
-                            sx={{
-                                py: 1.5,
-                                borderRadius: 3,
-                                bgcolor:
-                                    "rgba(134,239,172,.08)",
-                                color: "#d1fae5",
-                                border:
-                                    "1px solid rgba(134,239,172,.15)",
-                                "&:hover": {
-                                    bgcolor:
-                                        "rgba(134,239,172,.15)",
-                                },
-                            }}
-                        >
-                            Завантажити MP3
-
+                        <Button component="label" variant="outlined">
+                            🎧 Аудіо
                             <input
                                 hidden
                                 type="file"
                                 accept="audio/*"
                                 onChange={(e) =>
-                                    setAudio(
-                                        e.target
-                                            .files[0]
-                                    )
+                                    setAudio(e.target.files[0])
                                 }
                             />
                         </Button>
@@ -255,55 +158,23 @@ export default function App() {
                         <Button
                             type="submit"
                             variant="contained"
-                            sx={{
-                                py: 1.7,
-                                borderRadius: 3,
-                                fontSize: "1rem",
-                                fontWeight: 700,
-                                bgcolor: "#22c55e",
-                                boxShadow:
-                                    "0 10px 25px rgba(34,197,94,.25)",
-
-                                "&:hover": {
-                                    bgcolor:
-                                        "#16a34a",
-                                },
-                            }}
+                            sx={{ bgcolor: "#22c55e" }}
                         >
-                            Додати пісню
+                            Додати
                         </Button>
                     </Stack>
                 </Paper>
             </Container>
         </Box>
     );
-
 }
 
-const fieldStyles = {
+const inputStyle = {
+    input: { color: "white" },
+    label: { color: "#94a3b8" },
     "& .MuiOutlinedInput-root": {
-        color: "#f8fafc",
-        borderRadius: 3,
-        "& fieldset": {
-            borderColor:
-                "rgba(134,239,172,.15)",
-        },
-
-        "&:hover fieldset": {
-            borderColor: "#86efac",
-        },
-
-        "&.Mui-focused fieldset": {
-            borderColor: "#22c55e",
-        },
+        "& fieldset": { borderColor: "#334155" },
+        "&:hover fieldset": { borderColor: "#22c55e" },
+        "&.Mui-focused fieldset": { borderColor: "#22c55e" },
     },
-
-    "& .MuiInputLabel-root": {
-        color: "#94a3b8",
-    },
-
-    "& .MuiInputLabel-root.Mui-focused": {
-        color: "#86efac",
-    },
-
 };
