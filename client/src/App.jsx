@@ -1,4 +1,17 @@
 import { useEffect, useState } from "react";
+import Form from "./Form"
+import {
+    Box,
+    Button,
+    Container,
+    Paper,
+    Stack,
+    TextField,
+    Typography
+} from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import MusicNoteIcon from "@mui/icons-material/MusicNote";
+
 
 export default function App() {
     let [isConnected, setIsConnected] = useState(false);
@@ -14,6 +27,9 @@ export default function App() {
             ) : (
                 <h1>Server NOT connected</h1>
             )}
+            <Form/>
         </div>
+
     );
 }
+
