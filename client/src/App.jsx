@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import TrackList from "./TrackList";
+import Form from "./Form"
 
 export default function App() {
     let [isConnected, setIsConnected] = useState(false);
@@ -14,6 +16,8 @@ export default function App() {
             ) : (
                 <h1>Server NOT connected</h1>
             )}
+        <TrackList/>
+        <Form/>
         </div>
     );
 }
