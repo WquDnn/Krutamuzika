@@ -7,12 +7,12 @@ function TrackList() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Базовий URL твого Node.js сервера (зміни порт, якщо у тебе інший)
+    // Базовий URL твого Node.js сервера
     const SERVER_URL = 'http://localhost:3000';
 
     useEffect(() => {
         // Функція для отримання даних з сервера
-        fetch(`${SERVER_URL}/tracks`) // Твій сервер повинен мати такий GET-ендпоінт
+        fetch(`${SERVER_URL}/tracks`)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error('Не вдалося завантажити треки');
@@ -49,9 +49,12 @@ function TrackList() {
                             borderRadius: '8px',
                             gap: '15px'
                         }}>
-                            {/* Обкладинка треку */}
+                            {/* ОБКЛАДИНКА ТРЕКУ:
+                              Прибираємо шлях "/uploads/". Оскільки сервер роздає статику з папки static,
+                              файл доступний напряму за адресою сервера.
+                            */}
                             <img 
-                                src={`${SERVER_URL}/uploads/${track.image}`} 
+                                src={`${SERVER_URL}/${track.image}`} 
                                 alt={track.name} 
                                 style={{ width: '60px', height: '60px', borderRadius: '4px', objectFit: 'cover' }}
                             />
@@ -59,11 +62,16 @@ function TrackList() {
                             {/* Інформація про трек */}
                             <div style={{ flexGrow: 1 }}>
                                 <h3 style={{ margin: '0 0 5px 0' }}>{track.name}</h3>
-                                <p style={{ margin: 0, color: '#aaa', fontSize: '14px' }}>{track.author} • <span style={{ fontStyle: 'italic' }}>{track.genre}</span></p>
+                                <p style={{ margin: 0, color: '#aaa', fontSize: '14px' }}>
+                                    {track.author} • <span style={{ fontStyle: 'italic' }}>{track.genre}</span>
+                                </p>
                             </div>
                             
-                            {/* Плеєр для відтворення файлу */}
-                            <audio controls src={`${SERVER_URL}/uploads/${track.file_url}`}>
+                            {/* ПЛЕЄР ДЛЯ СТРІМІНГУ АУДІО:
+                              Замість прямого посилання на файл використовуємо наш новий ендпоінт,
+                              який передає аудіо шматками за його унікальним ID.
+                            */}
+                            <audio controls src={`${SERVER_URL}/tracks/${track.id}/stream`}>
                                 Ваш браузер не підтримує аудіо-елемент.
                             </audio>
                         </div>
