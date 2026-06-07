@@ -46,10 +46,14 @@ const storage = multer.diskStorage({
         cb(null, 'static');
     },
     filename: (req, file, cb) => {
-        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-    }
+        cb(
+            null,
+            Date.now() + path.extname(file.originalname)
+        );
+    },
 });
-const upload = multer({ storage: storage });
+
+const upload = multer({ storage });
 
 // Додавання нового треку (переписано на async/await)
 app.post("/add", upload.fields([{ name: "image", maxCount: 1 }, { name: "audio", maxCount: 1 }]), async (req, res) => {
