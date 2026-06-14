@@ -25,7 +25,7 @@ export default function App() {
         </Box>
 
                 {/* Підключаємо модальне вікно */}
-                <AddTrackModal open={open} handleClose={() => setOpen(false)} />
+                <AddTrackModal open={open} handleClose={() => setOpen(false)} SERVER_URL="http://localhost:3000"/>
             </Box></>
     );
 }

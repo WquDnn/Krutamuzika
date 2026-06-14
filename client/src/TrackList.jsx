@@ -1,21 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchTracks } from './trackSlice';
 
 const TrackList = ({ SERVER_URL }) => {
-    const [tracks, setTracks] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const dispatch = useDispatch();
+    
+    // Отримуємо дані зі стору Redux
+    const { items: tracks, loading, error } = useSelector((state) => state.tracks);
 
+    // Завантажуємо треки при монтуванні компонента
     useEffect(() => {
-        fetch(`${SERVER_URL}/tracks`)
-            .then(res => res.json())
-            .then(data => { setTracks(data); setLoading(false); })
-            .catch(err => { setError(err.message); setLoading(false); });
-    }, [SERVER_URL]);
+        dispatch(fetchTracks(SERVER_URL));
+    }, [dispatch, SERVER_URL]);
 
-    if (loading) return <div style={{ padding: '20px' }}>Завантаження...</div>;
+    if (loading) return <div style={{ padding: '20px', color: 'white' }}>Завантаження...</div>;
+    if (error) return <div style={{ padding: '20px', color: 'red' }}>Помилка: {error}</div>;
     
     return (
-        <div style={{ width: '300px', background: '#181818', padding: '20px', overflowY: 'auto', borderRight: '1px solid #333', height: "95vh" }}>
+        <div style={{ width: '300px', background: '#181818', padding: '20px', overflowY: 'auto', borderRight: '1px solid #333', height: "95vh", color: 'white' }}>
             <h2 style={{ color: "white"}}>Твоя бібліотека</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {tracks.map(track => (
