@@ -3,7 +3,7 @@ const cors = require("cors");
 const db = require("./db.js");
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs'); // Додано обов'язковий модуль для роботи з файлами
+const fs = require('fs');
 
 const app = express();
 
@@ -13,7 +13,6 @@ app.use(cors({
     methods: "*"
 }));
 
-// Визначаємось: усі файли лежать у папці 'static'
 app.use(express.static("static"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,6 +31,9 @@ app.get("/", async (req, res) => {
 // Отримання списку треків
 app.get("/tracks", async (req, res) => {
     try {
+        // УВАГА: Якщо у твоїй базі колонкова ідентифікатора називається НЕ "id" (наприклад track_id),
+        // обов'язково перевизнач її як 'id' через ALIAS (SELECT track_id AS id, ...), 
+        // бо фронтенд шукає саме currentTrack.id!
         let [results] = await db.query("SELECT * FROM musicinfo");
         res.send(results);
     } catch (error) {
@@ -40,22 +42,19 @@ app.get("/tracks", async (req, res) => {
     }
 });
 
-// Налаштування збереження файлів через Multer (все йде в папку 'static')
+// Налаштування Multer
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'static');
     },
     filename: (req, file, cb) => {
-        cb(
-            null,
-            Date.now() + path.extname(file.originalname)
-        );
+        cb(null, Date.now() + path.extname(file.originalname));
     },
 });
 
 const upload = multer({ storage });
 
-// Додавання нового треку (переписано на async/await)
+// Додавання нового треку
 app.post("/add", upload.fields([{ name: "image", maxCount: 1 }, { name: "audio", maxCount: 1 }]), async (req, res) => {
     const imageFile = req.files && req.files.image ? req.files.image[0].filename : null;
     const audioFile = req.files && req.files.audio ? req.files.audio[0].filename : null;
@@ -73,7 +72,6 @@ app.post("/add", upload.fields([{ name: "image", maxCount: 1 }, { name: "audio",
     }
 
     try {
-        // Використовуємо проміси, як і в інших ендпоінтах
         const [result] = await db.query("INSERT INTO musicinfo SET ?", musicData);
         res.status(201).send({ status: "ok", id: result.insertId });
     } catch (err) {
@@ -82,9 +80,8 @@ app.post("/add", upload.fields([{ name: "image", maxCount: 1 }, { name: "audio",
     }
 });
 
-// ФУНКЦІЯ СТРІМІНГУ АУДІО (Адаптована getMovie під getAudio)
+// ФУНКЦІЯ СТРІМІНГУ АУДІО
 function getAudio(req, res) {
-    // Оскільки multer зберігає в 'static', шукаємо файл саме там
     const audioPath = path.resolve(__dirname, "static", req.filename);
     
     if (!fs.existsSync(audioPath)) {
@@ -112,33 +109,46 @@ function getAudio(req, res) {
             "Content-Range": `bytes ${start}-${end}/${fileSize}`,
             "Content-Length": chunksize,
             "Accept-Ranges": "bytes",
-            "Content-Type": "audio/mpeg" // Змінено тип на аудіо
+            "Content-Type": "audio/mpeg"
         };
         
         res.writeHead(206, head);
+        
+        // КРИТИЧНО: Якщо юзер перемкне трек або закриє вкладку, 
+        // потік треба закрити, інакше сервер вилетить з помилкою "ERR_STREAM_WRITE_AFTER_END"
+        req.on("close", () => {
+            file.destroy();
+        });
+
         file.pipe(res);
     } else {
         const head = {
-            "Content-Type": "audio/mpeg", // Змінено тип на аудіо
+            "Content-Type": "audio/mpeg",
             "Content-Length": fileSize,
         };
         res.writeHead(200, head);
-        fs.createReadStream(audioPath).pipe(res);
+        
+        const file = fs.createReadStream(audioPath);
+        req.on("close", () => {
+            file.destroy();
+        });
+        
+        file.pipe(res);
     }
 }
 
-// Ендпоінт для прослуховування конкретного треку по ID (переписано на async/await)
+// Ендпоінт стрімінгу
 app.get("/tracks/:id/stream", async (req, res, next) => {
     const id = req.params.id;
     try {
-        // Шукаємо трек у таблиці musicinfo
+        // ПЕРЕВІР ТУТ: Якщо в тебе в БД первинний ключ називається music_id, 
+        // то пиши WHERE music_id = ?, а не id = ?
         const [result] = await db.query("SELECT file_url FROM musicinfo WHERE id = ?", [id]);
         
         if (result.length === 0) {
             return res.status(404).send("Track not found.");
         }
         
-        // Передаємо ім'я файлу (стовпчик file_url) у мідлвар getAudio
         req.filename = result[0].file_url;
         next();
     } catch (err) {
