@@ -11,7 +11,7 @@ function TrackList() {
     const SERVER_URL = 'http://localhost:3000';
 
     useEffect(() => {
-        // Функція для отримання даних з сервера
+       
         fetch(`${SERVER_URL}/tracks`)
             .then((response) => {
                 if (!response.ok) {
