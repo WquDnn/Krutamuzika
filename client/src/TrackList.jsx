@@ -11,7 +11,7 @@ const TrackList = ({ SERVER_URL }) => {
 
     // Завантажуємо треки при монтуванні компонента
     useEffect(() => {
-        dispatch(fetchTracks(SERVER_URL));
+        dispatch(fetchTracks());
     }, [dispatch, SERVER_URL]);
 
     if (loading) return <div style={{ padding: '20px', color: 'white' }}>Завантаження...</div>;
@@ -25,7 +25,7 @@ const TrackList = ({ SERVER_URL }) => {
             overflowY: 'auto', 
             borderRight: '1px solid #333', 
             // Зменшуємо висоту на 90px, щоб список не перекривався нижнім плеєром
-            height: "calc(100vh - 90px)", 
+            // height: "calc(100vh - 10px)", 
             color: 'white',
             boxSizing: 'border-box'
         }}>

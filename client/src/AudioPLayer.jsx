@@ -83,10 +83,12 @@ const AudioPlayer = ({ SERVER_URL }) => {
             alignItems: 'center',
             justifyContent: 'center',
             // Робимо градієнтний фон, як у Spotify (можеш налаштувати колір під себе)
-            background: 'linear-gradient(to bottom, #3b4d2b, #121212)', 
-            padding: '40px',
+            background: 'linear-gradient(to bottom, #a4a4a4, #121212)', 
+            // padding: '40px',
+            paddingTop: "80px",
+            paddingBottom: "30px",
             boxSizing: 'border-box',
-            height: '100vh',
+            // height: '100vh',
             position: 'relative'
         }}>
             <audio 
@@ -108,8 +110,8 @@ const AudioPlayer = ({ SERVER_URL }) => {
                 
                 {/* ВЕЛИКА ОБКЛАДИНКА ТРЕКУ */}
                 <div style={{
-                    width: '320px',
-                    height: '320px',
+                    width: '220px',
+                    aspectRatio: "1/1",
                     borderRadius: '12px',
                     overflow: 'hidden',
                     boxShadow: '0 15px 35px rgba(0,0,0,0.6)',

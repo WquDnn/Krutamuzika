@@ -7,11 +7,13 @@ export const fetchTracks = createAsyncThunk(
 
   'tracks/fetchTracks',
 
-  async (SERVER_URL, { rejectWithValue }) => {
+  async (name, { rejectWithValue }) => {
 
     try {
 
-      const response = await fetch(`${SERVER_URL}/tracks`);
+      const response = await fetch(`http://localhost:3000/tracks` + (name != null ? (`?` + new URLSearchParams({
+        name
+      }).toString()) : ""));
 
       if (!response.ok) throw new Error('Не вдалося завантажити треки');
 

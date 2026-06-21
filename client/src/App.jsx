@@ -10,7 +10,7 @@ export default function App() {
     const SERVER_URL = "http://localhost:3000"; // Винесли в константу, щоб не дублювати
 
     return (
-        <Box sx={{ minHeight: "100vh", bgcolor: "#121212", color: "white", pb: "90px", position: "relative" }}>
+        <Box sx={{ minHeight: "100vh", bgcolor: "#121212", color: "white", position: "relative" }}>
             {/* Хедер додатку */}
             <Header />
             
@@ -33,7 +33,7 @@ export default function App() {
                 sx={{ 
                     bgcolor: "#22c55e", 
                     position: "fixed", 
-                    bottom: "110px", // Підняли на 110px, щоб вона не перекривалася плеєром (який займає 90px)
+                    bottom: "1.5rem", // Підняли на 110px, щоб вона не перекривалася плеєром (який займає 90px)
                     right: "2rem",
                     zIndex: 10,
                     '&:hover': { bgcolor: '#16a34a' }

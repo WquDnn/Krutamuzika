@@ -31,11 +31,18 @@ app.get("/", async (req, res) => {
 // Отримання списку треків
 app.get("/tracks", async (req, res) => {
     try {
+        let name = req.query.name
         // УВАГА: Якщо у твоїй базі колонкова ідентифікатора називається НЕ "id" (наприклад track_id),
         // обов'язково перевизнач її як 'id' через ALIAS (SELECT track_id AS id, ...), 
         // бо фронтенд шукає саме currentTrack.id!
-        let [results] = await db.query("SELECT * FROM musicinfo");
-        res.send(results);
+        console.log(name)
+        if(name){
+            let [results] = await db.query("SELECT * FROM musicinfo where name like ? ", [`%${name}%`]);
+            return res.send(results);
+            
+        }
+        let [results] = await db.query("SELECT * FROM musicinfo ");
+        return res.send(results);
     } catch (error) {
         console.error(error);
         res.status(500).send("Помилка отримання треків");
