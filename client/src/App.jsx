@@ -20,8 +20,9 @@ export default function App() {
                 <TrackList SERVER_URL={SERVER_URL} />
 
                 {/* Основна робоча область (тут може бути Form або інший контент) */}
-                <Box sx={{ flexGrow: 1, p: 4 }}>
+                <Box sx={{ flexGrow: 1 }}>
                     {/* Твій контент по центру, якщо треба */}
+                    <AudioPlayer SERVER_URL={SERVER_URL} />
                 </Box>
             </Box>
 
@@ -49,7 +50,7 @@ export default function App() {
             />
 
             {/* 🔥 Нижній фіксований плеєр, який керується через Redux */}
-            <AudioPlayer SERVER_URL={SERVER_URL} />
+            
         </Box>
     );
 }

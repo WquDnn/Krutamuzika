@@ -184,10 +184,7 @@ const AudioPlayer = ({ SERVER_URL }) => {
 
                 {/* КНОПКИ КЕРУВАННЯ */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
-                    {/* Кнопка назад (Заглушка) */}
-                    <button style={{ background: 'none', border: 'none', color: '#b3b3b3', fontSize: '24px', cursor: 'pointer' }}>
-                        ⏮
-                    </button>
+                  
 
                     {/* Головна кнопка PLAY / PAUSE */}
                     <button 
@@ -213,10 +210,7 @@ const AudioPlayer = ({ SERVER_URL }) => {
                         {isPlaying ? '⏸' : '▶'}
                     </button>
 
-                    {/* Кнопка вперед (Заглушка) */}
-                    <button style={{ background: 'none', border: 'none', color: '#b3b3b3', fontSize: '24px', cursor: 'pointer' }}>
-                        ⏭
-                    </button>
+                   
                 </div>
 
             </div>

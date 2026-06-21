@@ -15,8 +15,7 @@ const Header = () => (
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             <input type="text" placeholder="Пошук..." style={{ padding: '6px 12px', borderRadius: '15px', border: '1px solid #444', background: '#222', color: 'white' }} />
-            <button style={{ padding: '6px 12px', borderRadius: '15px', border: '1px solid #444', background: 'transparent', color: 'white', cursor: 'pointer' }}>UK</button>
-        </div>
+            </div>
     </header>
 );
 
