@@ -3,19 +3,19 @@ import TrackList from "./TrackList";
 import Header from "./Header";
 import AudioPlayer from "./AudioPlayer"; // 🔥 Імпортуємо наш новий плеєр
 import AddTrackModal from "./AddTrackModal";
-import { Box, Button } from "@mui/material";
+import { Box, Button, useMediaQuery } from "@mui/material";
 
 export default function App() {
     const [open, setOpen] = useState(false);
     const SERVER_URL = "http://localhost:3000"; // Винесли в константу, щоб не дублювати
-
+   const isPhone = useMediaQuery("(max-width: 768px)");
     return (
-        <Box sx={{ minHeight: "100vh", bgcolor: "#121212", color: "white", position: "relative" }}>
+        <Box  sx={{ minHeight: "100vh", bgcolor: "#121212", color: "white", position: "relative" }} >
             {/* Хедер додатку */}
             <Header />
             
             {/* Головний контент (Сайдбар + основна частина) */}
-            <Box sx={{ display: "flex", minHeight: "calc(100vh - 64px)" }}>
+            <Box  sx={{ display: "flex", minHeight: "calc(100vh - 64px)", flexDirection: !isPhone? "row": "column" }}>
                 {/* Список треків з Redux */}
                 <TrackList SERVER_URL={SERVER_URL} />
 

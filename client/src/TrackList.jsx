@@ -2,9 +2,11 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 // Імпортуємо fetchTracks та новий екшен для вибору треку
 import { fetchTracks, setCurrentTrack } from './trackSlice';
+import { useMediaQuery } from "@mui/material";
 
 const TrackList = ({ SERVER_URL }) => {
     const dispatch = useDispatch();
+        const isPhone = useMediaQuery("(max-width: 768px)");
     
     // Отримуємо дані зі стору Redux (додали currentTrack)
     const { items: tracks, loading, error, currentTrack } = useSelector((state) => state.tracks);
@@ -19,7 +21,7 @@ const TrackList = ({ SERVER_URL }) => {
     
     return (
         <div style={{ 
-            width: '300px', 
+            width: isPhone ? "100wh": '300px', 
             background: '#181818', 
             padding: '20px', 
             overflowY: 'auto', 
