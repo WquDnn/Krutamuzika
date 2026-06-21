@@ -1,10 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-<<<<<<< HEAD
 import { setIsPlaying } from './trackSlice'; // Переконайся, що шлях правильний
-=======
-import { setIsPlaying } from './trackSlice'; // Переконайся, що імпорт відповідає твоїй назві файлу
->>>>>>> 731f2f225c1aee32eed1378ac4858c00385b9461
 
 const AudioPlayer = ({ SERVER_URL }) => {
     const dispatch = useDispatch();
